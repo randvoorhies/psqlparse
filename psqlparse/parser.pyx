@@ -1,23 +1,19 @@
 import json
 
-import six
-
 from .nodes.utils import build_from_obj
 from .exceptions import PSqlParseError
-from .pg_query cimport (pg_query_parse, pg_query_free_parse_result,
-                       PgQueryParseResult)
+from .pg_query cimport (pg_query_parse, pg_query_free_parse_result)
 
 
-def parse_dict(query):
+def parse_dict(query, cleanup=True):
     cdef bytes encoded_query
-    cdef PgQueryParseResult result
 
-    if isinstance(query, six.text_type):
+    if isinstance(query, str):
         encoded_query = query.encode('utf8')
-    elif isinstance(query, six.binary_type):
+    elif isinstance(query, bytes):
         encoded_query = query
     else:
-        encoded_query = six.text_type(query).encode('utf8')
+        encoded_query = str(query).encode('utf8')
 
     result = pg_query_parse(encoded_query)
     if result.error:
@@ -29,7 +25,11 @@ def parse_dict(query):
     statement_dicts = json.loads(result.parse_tree.decode('utf8'),
                                  strict=False)
     pg_query_free_parse_result(result)
-    return statement_dicts
+    
+    if cleanup:
+        return [statement['stmt'] for statement in statement_dicts['stmts']]
+    else:
+        return statement_dicts
 
 
 def parse(query):

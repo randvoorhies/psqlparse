@@ -21,7 +21,8 @@ Make sure you have bison and flex installed on your system.
         build_ext.run(self)
 
 
-USE_CYTHON = bool(os.environ.get('USE_CYTHON'))
+# USE_CYTHON = bool(os.environ.get('USE_CYTHON'))
+USE_CYTHON=True
 
 ext = '.pyx' if USE_CYTHON else '.c'
 
@@ -40,12 +41,12 @@ if USE_CYTHON:
     extensions = cythonize(extensions)
 
 setup(name='psqlparse',
-      version='1.0-rc7',
+      version='2.0.0',
       url='https://github.com/alculquicondor/psqlparse',
       author='Aldo Culquicondor',
       author_email='aldo@amigocloud.com',
       description='Parse SQL queries using the PostgreSQL query parser',
-      install_requires=['six'],
+      install_requires=['Cython'],
       license='BSD',
       cmdclass={'build_ext': PSqlParseBuildExt},
       packages=['psqlparse', 'psqlparse.nodes'],
